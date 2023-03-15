@@ -17,11 +17,24 @@ export class IcdMapComponent {
   selectedReasonCIE11: any[] = [];
   icd11Data: any[] = [];
   icd11MapData: any[] = [];
+  term: string = '';
+
+  chips = [
+    { code : '195967001', display : 'Asthma' },
+    { code : '421671002', display : 'Pneumonia with AIDS (acquired immunodeficiency syndrome)' },
+    { code : '16705321000119109', display : 'Neoplasm of right kidney' }
+    ];
 
   constructor(private terminologyService: TerminologyService, private http: HttpClient, private dialog: MatDialog) { }
 
   ngOnInit(): void {
     this.fetchTsvFile();
+  }
+
+  setChip(chip: any) {
+    this.term = chip.display;
+    this.selectedReasonSct = chip;
+    this.updateReason(chip);
   }
 
   async updateReason(event: any) {
@@ -52,6 +65,12 @@ export class IcdMapComponent {
           return -1;
         }
         if (a.mapPriority > b.mapPriority) {
+          return 1;
+        }
+        if (a.mapTarget < b.mapTarget) {
+          return -1;
+        }
+        if (a.mapTarget > b.mapTarget ) {
           return 1;
         }
         return 0;
@@ -86,6 +105,28 @@ export class IcdMapComponent {
     this.selectedReasonCIE = [];
     let response = this.terminologyService.runEclLegacy(`^[*] 447562003 |ICD-10 complex map reference set| {{ M referencedComponentId = "${event.code}" }}`);
     response.subscribe(result => {
+      // sort result.items by mapGroup , mapPriority and mapTarget
+      result.items.sort((a: any, b: any) => {
+        if (a.mapGroup < b.mapGroup) {
+          return -1;
+        }
+        if (a.mapGroup > b.mapGroup) {
+          return 1;
+        }
+        if (a.mapPriority < b.mapPriority) {
+          return -1;
+        }
+        if (a.mapPriority > b.mapPriority) {
+          return 1;
+        }
+        if (a.mapTarget < b.mapTarget) {
+          return -1;
+        }
+        if (a.mapTarget > b.mapTarget ) {
+          return 1;
+        }
+        return 0;
+      });
       result.items.forEach( (element: any) => {
         if (element.mapRule == 'TRUE' || element.mapRule == 'IFA 248153007 | Male (finding) |') {
           // remove the second digit after the dot in element.mapTarget

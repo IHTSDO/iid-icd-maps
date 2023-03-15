@@ -1,6 +1,6 @@
 .code {
     font-weight: bold;
-    color: rgb(43, 119, 184);
+    color: rgb(184, 154, 43);
 }
 
 .card-container {
@@ -27,4 +27,12 @@ mat-card-title {
 .selected-reason {
     display: flex;
     align-items: center;
-  }
+}
+
+.postcoordination {
+    margin-left: 50px;
+}
+
+.chips {
+    margin-bottom: 15px;
+}

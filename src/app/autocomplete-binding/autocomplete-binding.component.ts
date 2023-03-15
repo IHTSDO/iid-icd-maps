@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
 import {debounceTime, distinctUntilChanged, map, startWith, switchMap,tap} from 'rxjs/operators';
 import {Observable, of, Subject} from 'rxjs';
@@ -11,8 +11,9 @@ import { TerminologyService } from '../services/terminology.service';
 })
 export class AutocompleteBindingComponent implements OnInit {
   @Input() binding: any;
+  @Input() term: string = "";
   @Output() selectionChange = new EventEmitter<any>();
-
+  
   formControl = new UntypedFormControl();
   autoFilter: Observable<any> | undefined;
   loading = false;
@@ -37,6 +38,10 @@ export class AutocompleteBindingComponent implements OnInit {
         this.loading = false;
       })
     );  
+  }
+
+  onTermChange() {
+    this.formControl.setValue(this.term);
   }
 
   optionSelected(value: any) {

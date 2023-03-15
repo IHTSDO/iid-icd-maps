@@ -5,15 +5,22 @@
           <mat-card-subtitle>Clinical mapping demonstration</mat-card-subtitle>
         </mat-card-header>
         <mat-card-content>
-            <div id="pic-box">
-                <img src="assets/img/user.png" alt="image" class="user-pic" height="70px">
-            </div>
-            <div>
-                <p id="patient-name">Test, Patient</p>
-                <p>DOB: 1970/03/27 - Gender: Male</p>
+            <div class="selected-reason">
+                <div id="pic-box">
+                    <img src="assets/img/user.png" alt="image" class="user-pic" height="70px">
+                </div>
+                <div>
+                    <p id="patient-name">Test, Patient</p>
+                    <p>DOB: 1970/03/27 - Gender: Male</p>
+                </div>
             </div>
             <h4>Diagnosis</h4>
-            <app-autocomplete-binding [binding]="eclReason" (selectionChange)="updateReason($event)"></app-autocomplete-binding>
+            <app-autocomplete-binding [binding]="eclReason" [term]="term" (selectionChange)="updateReason($event)"></app-autocomplete-binding>
+            <div class="chips">
+                <mat-chip-listbox aria-label="Dog selection">
+                    <mat-chip *ngFor="let item of chips" (click)="setChip(item)">{{item.display}}</mat-chip>
+                  </mat-chip-listbox>
+            </div>
             <div *ngIf="selectedReasonSct && selectedReasonSct.code" class="codigos">SNOMED CT Code: <span class="code">{{selectedReasonSct.code}}</span> |{{selectedReasonSct.display}}|</div>
         </mat-card-content>
     </mat-card>
@@ -28,7 +35,7 @@
                 <p>CIE-10 maps:</p>
                 <p class="selected-reason" *ngFor="let item of selectedReasonCIE">
                     <span class="code">{{item.code}}</span>&nbsp;&nbsp;{{item.display}} 
-                    <a mat-icon-button color="primary" href="https://icd.who.int/browse10/2019/en#/{{item.code}}" target="_blank">
+                    <a mat-icon-button color="accent" href="https://icd.who.int/browse10/2019/en#/{{item.code}}" target="_blank">
                         <mat-icon>open_in_new</mat-icon>
                     </a>
                 </p>
@@ -47,16 +54,16 @@
                     <ng-container *ngFor="let code of selectedReasonCIE11; ; let ii = index">
                         <span *ngIf='ii>0'>,&nbsp;</span>
                         <ng-container *ngFor="let part of code; let i = index">
-                            <span class="code">{{ part.code }}</span><ng-container *ngIf="i !== code.length - 1">&amp;</ng-container>
+                            <span class="code">{{ part.code }}<ng-container *ngIf="i !== code.length - 1">&amp;</ng-container></span>
                         </ng-container>
                     </ng-container>
                     <ng-container *ngFor="let code of selectedReasonCIE11; ; let ii = index">
                         
                         <ng-container *ngFor="let part of code; let i = index">
-                            <p class="selected-reason">
+                            <p class="selected-reason" [class.postcoordination]="i>0">
                                 <span class="code">{{ part.code }}</span>&nbsp;&nbsp;{{part.display}}
                                 <a *ngIf="part.uri"
-                                    mat-icon-button color="primary" href="https://icd.who.int/dev11/l-m/en#/{{part.uri}}" target="_blank">
+                                    mat-icon-button color="accent" href="https://icd.who.int/dev11/l-m/en#/{{part.uri}}" target="_blank">
                                     <mat-icon>open_in_new</mat-icon>
                                 </a>
                             </p>

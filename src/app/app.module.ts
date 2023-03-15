@@ -22,6 +22,7 @@ import {MatInputModule} from '@angular/material/input';
 import {MatCardModule} from '@angular/material/card';
 import {MatDialogModule} from '@angular/material/dialog';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
+import {MatChipsModule} from '@angular/material/chips';
 
 import { IcdMapComponent } from './icd-map/icd-map.component';
 import { AutocompleteBindingComponent } from './autocomplete-binding/autocomplete-binding.component';
@@ -57,7 +58,8 @@ import { LoadingDialogComponent } from './alerts/loading-dialog.component';
     MatInputModule,
     MatCardModule,
     MatDialogModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    MatChipsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -1,7 +1,7 @@
 <mat-form-field>
   <!-- <mat-label>New SNOMED Problem</mat-label> -->
-  <input type="text" placeholder="{{'Search...'}}" matInput [formControl]="formControl" [matAutocomplete]="auto"
-    [value]="selectedConcept.display">
+  <input type="text" placeholder="{{'Search...'}}" matInput [formControl]="formControl" [matAutocomplete]="auto" [(ngModel)]="term"
+  [value]="selectedConcept.display">
   <button matSuffix mat-icon-button aria-label="Clear" (click)="clearInput()">
     <mat-icon>close</mat-icon>
   </button>
