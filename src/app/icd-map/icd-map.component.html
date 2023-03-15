@@ -1,0 +1,69 @@
+<div class="card-container">
+    <mat-card class="wide-card">
+        <mat-card-header>
+          <mat-card-title>Maps to the International Classification of Diseases</mat-card-title>
+          <mat-card-subtitle>Clinical mapping demonstration</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+            <div id="pic-box">
+                <img src="assets/img/user.png" alt="image" class="user-pic" height="70px">
+            </div>
+            <div>
+                <p id="patient-name">Test, Patient</p>
+                <p>DOB: 1970/03/27 - Gender: Male</p>
+            </div>
+            <h4>Diagnosis</h4>
+            <app-autocomplete-binding [binding]="eclReason" (selectionChange)="updateReason($event)"></app-autocomplete-binding>
+            <div *ngIf="selectedReasonSct && selectedReasonSct.code" class="codigos">SNOMED CT Code: <span class="code">{{selectedReasonSct.code}}</span> |{{selectedReasonSct.display}}|</div>
+        </mat-card-content>
+    </mat-card>
+</div>
+<div class="card-container">
+    <mat-card class="card">
+        <mat-card-header>
+          <mat-card-title>ICD-10 Map</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div *ngIf="selectedReasonCIE.length"> 
+                <p>CIE-10 maps:</p>
+                <p class="selected-reason" *ngFor="let item of selectedReasonCIE">
+                    <span class="code">{{item.code}}</span>&nbsp;&nbsp;{{item.display}} 
+                    <a mat-icon-button color="primary" href="https://icd.who.int/browse10/2019/en#/{{item.code}}" target="_blank">
+                        <mat-icon>open_in_new</mat-icon>
+                    </a>
+                </p>
+            </div>
+          </mat-card-content>
+    </mat-card>
+    <mat-card class="card">
+        <mat-card-header>
+          <mat-card-title>ICD-11 Map</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div *ngIf="selectedReasonCIE11.length">
+                <p>CIE-11 maps:</p>
+                <ng-container>
+                    Codes: 
+                    <ng-container *ngFor="let code of selectedReasonCIE11; ; let ii = index">
+                        <span *ngIf='ii>0'>,&nbsp;</span>
+                        <ng-container *ngFor="let part of code; let i = index">
+                            <span class="code">{{ part.code }}</span><ng-container *ngIf="i !== code.length - 1">&amp;</ng-container>
+                        </ng-container>
+                    </ng-container>
+                    <ng-container *ngFor="let code of selectedReasonCIE11; ; let ii = index">
+                        
+                        <ng-container *ngFor="let part of code; let i = index">
+                            <p class="selected-reason">
+                                <span class="code">{{ part.code }}</span>&nbsp;&nbsp;{{part.display}}
+                                <a *ngIf="part.uri"
+                                    mat-icon-button color="primary" href="https://icd.who.int/dev11/l-m/en#/{{part.uri}}" target="_blank">
+                                    <mat-icon>open_in_new</mat-icon>
+                                </a>
+                            </p>
+                        </ng-container>
+                    </ng-container>
+                </ng-container>
+            </div>
+          </mat-card-content>
+    </mat-card>
+</div>

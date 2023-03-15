@@ -1,0 +1,30 @@
+.code {
+    font-weight: bold;
+    color: rgb(43, 119, 184);
+}
+
+.card-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: stretch;
+  }
+  
+.card {
+    width: calc(50% - 10px);
+    margin-bottom: 20px;
+}
+
+.wide-card {
+    width: calc(100% - 10px);
+    margin-bottom: 20px;
+}
+mat-card-title {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.selected-reason {
+    display: flex;
+    align-items: center;
+  }
