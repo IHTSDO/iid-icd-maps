@@ -11,6 +11,14 @@ import * as Papa from 'papaparse';
   styleUrls: ['./icd-map.component.css']
 })
 export class IcdMapComponent {
+  genders: any[] = [
+    {code: "248152002", display: "Female"},
+    {code: "248153007", display: "Male"},
+    {code: "000000000", display: "No information"}
+  ];
+  gender = this.genders[0];
+  age = 35;
+
   eclReason = '< 404684003 |Clinical finding|';
   selectedReasonSct: any;
   selectedReasonCIE: any[] = [];
@@ -19,10 +27,20 @@ export class IcdMapComponent {
   icd11MapData: any[] = [];
   term: string = '';
 
+  icd10rules: any[] = [];
+  icd10DisplayedColumns: string[] = ['mapGroup', 'mapPriority', 'mapRule', 'mapAdvice', 'mapTarget', 'link', 'result'];
+  loadingIcd10 = false;
+  icd11rules: any[] = [];
+  icd11DisplayedColumns: string[] = ['mapGroup', 'mapPriority', 'mapRule', 'mapAdvice', 'mapTarget', 'result'];
+  loadingIcd11 = false;
+
   chips = [
     { code : '195967001', display : 'Asthma' },
     { code : '421671002', display : 'Pneumonia with AIDS (acquired immunodeficiency syndrome)' },
-    { code : '16705321000119109', display : 'Neoplasm of right kidney' }
+    { code : '16705321000119109', display : 'Neoplasm of right kidney' },
+    { code : '95208000', display : 'Photogenic epilepsy' },
+    { code : '8619003', display : 'Infertile' },
+    { code : '717934004', display : 'Osteomalacia due to vitamin D deficiency'}
     ];
 
   constructor(private terminologyService: TerminologyService, private http: HttpClient, private dialog: MatDialog) { }
@@ -39,7 +57,6 @@ export class IcdMapComponent {
 
   async updateReason(event: any) {
     this.selectedReasonSct = event;
-    // ^[*] 447562003 |ICD-10 complex map reference set| {{ M referencedComponentId = "782513000" }}
     if (event && event.code) {
       this.matchIcd10(event);
       this.matchIcd11(event);
@@ -47,13 +64,14 @@ export class IcdMapComponent {
   }
 
   matchIcd11(event: any) {
+    this.loadingIcd11 = true;
     this.selectedReasonCIE11 = [];
-    // filter the icd11data array to the matching event.code
+    this.icd11rules = [];
     let filteredData = this.icd11MapData.filter((element: any) => element.referencedComponentId == event.code);
     if (!filteredData || !filteredData[0].mapTarget) {
       this.selectedReasonCIE11.push([{ code: '', display: 'MAP SOURCE CONCEPT CANNOT BE CLASSIFIED WITH AVAILABLE DATA' }]);
+      this.icd11rules = filteredData;
     } else {
-      // iterate over the filteredData based on mapGroup and mapPriority ascending order
       filteredData.sort((a: any, b: any) => {
         if (a.mapGroup < b.mapGroup) {
           return -1;
@@ -75,7 +93,7 @@ export class IcdMapComponent {
         }
         return 0;
       });
-      // iterate over the filteredData, for each mapGroup, create an array of all the mapTargets and push it to the selectedReasonCIE11 array
+      this.icd11rules = filteredData;
       let mapGroup = 0;
       let mapTargets: any[] = [];
       filteredData.forEach((element: any) => {
@@ -88,9 +106,12 @@ export class IcdMapComponent {
         }
         let display = this.icd11Data.find((icd11Element: any) => icd11Element.Code == element.mapTarget);
         if (display) {
-          console.log(display)
           display.Title = display?.Title?.replace(/- /g, '');
-          mapTargets.push({ code: element.mapTarget, display: display.Title, uri: display["Foundation URI"]});
+          let uri = display["Foundation URI"];
+          if (!uri) {
+            uri = display["Linearization (release) URI"];
+          }
+          mapTargets.push({ code: element.mapTarget, display: display.Title, uri: uri});
         } else {
           mapTargets.push({ code: element.mapTarget, display: 'Not found in ICD11'});
         }
@@ -99,13 +120,15 @@ export class IcdMapComponent {
         this.selectedReasonCIE11.push(mapTargets);
       }
     }
+    this.loadingIcd11 = false;
   }
 
   matchIcd10(event: any) {
+    this.loadingIcd10 = true;
+    this.icd10rules = [];
     this.selectedReasonCIE = [];
     let response = this.terminologyService.runEclLegacy(`^[*] 447562003 |ICD-10 complex map reference set| {{ M referencedComponentId = "${event.code}" }}`);
     response.subscribe(result => {
-      // sort result.items by mapGroup , mapPriority and mapTarget
       result.items.sort((a: any, b: any) => {
         if (a.mapGroup < b.mapGroup) {
           return -1;
@@ -127,22 +150,50 @@ export class IcdMapComponent {
         }
         return 0;
       });
+      this.icd10rules = result.items;
+      let group = 0;
       result.items.forEach( (element: any) => {
-        if (element.mapRule == 'TRUE' || element.mapRule == 'IFA 248153007 | Male (finding) |') {
-          // remove the second digit after the dot in element.mapTarget
-          let dotIndex = element.mapTarget.indexOf('.');
-          if (dotIndex > 0) {
-            element.mapTarget = element.mapTarget.substring(0, dotIndex + 2) + element.mapTarget.substring(dotIndex + 3);
+        let passesMapRules = false;
+        if (element.mapRule == 'TRUE' || element.mapRule == "OTHERWISE TRUE") {
+          passesMapRules = true;
+        } else if (element.mapRule == 'IFA 248153007 | Male (finding) |' && this.gender.code == "248153007") {
+          passesMapRules = true;
+        } else if (element.mapRule == 'IFA 248152002 | Female (finding) |' && this.gender.code == "248152002") {
+          passesMapRules = true;
+        } else if (element.mapRule.indexOf('IFA 445518008 | Age at onset of clinical finding (observable entity) |') >= 0 ) {
+          let localRule = element.mapRule;
+          localRule = localRule.replace('IFA 445518008 | Age at onset of clinical finding (observable entity) |', 'this.age');
+          localRule = localRule.replace('AND', '&&');
+          localRule = localRule.replace('OR', '||');
+          localRule = localRule.replace(' years', '');
+          if (eval(localRule)) {
+            passesMapRules = true;
           }
-          let cieCode = { code: element.mapTarget, display: ''};
-          this.terminologyService.lookupOtherCodeSystems('http://hl7.org/fhir/sid/icd-10', cieCode.code).subscribe(lookupResponse => {
-            if (lookupResponse?.parameter?.length > 0) {
-              cieCode.display = lookupResponse.parameter.find((param: any) => param.name == 'display').valueString;
+        }
+        if ( passesMapRules && element.mapGroup !== group) {
+            element.result = true;
+            group = element.mapGroup;
+            let searchCode = element.mapTarget;
+            let dotIndex = element.mapTarget.indexOf('.');
+            if (dotIndex > 0) {
+              searchCode = element.mapTarget.substring(0, dotIndex + 2) + element.mapTarget.substring(dotIndex + 3);
+            }
+            if (element.mapTarget) {
+              let cieCode = { code: element.mapTarget, display: '[Label not found]'};
+              this.terminologyService.lookupOtherCodeSystems('http://hl7.org/fhir/sid/icd-10', searchCode).subscribe(lookupResponse => {
+                if (lookupResponse?.parameter?.length > 0) {
+                  cieCode.display = lookupResponse.parameter.find((param: any) => param.name == 'display').valueString;
+                }
+                this.selectedReasonCIE.push(cieCode);
+              });
+            } else {
+              let cieCode = { code: element.mapTarget, display: element.mapAdvice};
               this.selectedReasonCIE.push(cieCode);
             }
-          });
+          
         }
       });
+      this.loadingIcd10 = false;
     });
   }
   

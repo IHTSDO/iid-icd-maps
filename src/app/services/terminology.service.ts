@@ -144,7 +144,7 @@ export class TerminologyService {
     let requestUrl = `${this.snowstormFhirBase}/CodeSystem/$lookup?system=${system}&code=${code}`
     return this.http.get<any>(requestUrl)
       .pipe(
-        catchError(this.handleError<any>('translate', {}))
+        catchError(this.handleError<any>('lookup', {}))
       );
   }
 }

@@ -5,13 +5,27 @@
           <mat-card-subtitle>Clinical mapping demonstration</mat-card-subtitle>
         </mat-card-header>
         <mat-card-content>
-            <div class="selected-reason">
+            <div class="selected-reason-big">
                 <div id="pic-box">
-                    <img src="assets/img/user.png" alt="image" class="user-pic" height="70px">
+                    <img src="assets/img/user-male.svg" alt="image" class="user-pic" height="120px" *ngIf="gender.display == 'Male'">
+                    <img src="assets/img/user-female.svg" alt="image" class="user-pic" height="120px"  *ngIf="gender.display == 'Female'">
+                    <img src="assets/img/user-no.svg" alt="image" class="user-pic" height="120px"  *ngIf="gender.display == 'No information'">
                 </div>
                 <div>
                     <p id="patient-name">Test, Patient</p>
-                    <p>DOB: 1970/03/27 - Gender: Male</p>
+                    <p>Age:
+                        <mat-form-field>
+                            <input matInput [(ngModel)]="age">
+                        </mat-form-field>
+                       Gender: 
+                        <mat-form-field appearance="fill">
+                            <mat-select [(ngModel)]="gender">
+                              <mat-option *ngFor="let gender of genders" [value]="gender">
+                                {{gender.display}}
+                              </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </p>
                 </div>
             </div>
             <h4>Diagnosis</h4>
@@ -21,42 +35,100 @@
                     <mat-chip *ngFor="let item of chips" (click)="setChip(item)">{{item.display}}</mat-chip>
                   </mat-chip-listbox>
             </div>
-            <div *ngIf="selectedReasonSct && selectedReasonSct.code" class="codigos">SNOMED CT Code: <span class="code">{{selectedReasonSct.code}}</span> |{{selectedReasonSct.display}}|</div>
+            <div *ngIf="selectedReasonSct && selectedReasonSct.code" class="codigos">
+                SNOMED CT Code: <span class="code">{{selectedReasonSct.code}}</span> |{{selectedReasonSct.display}}|
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <button mat-flat-button color="primary" (click)="updateReason(selectedReasonSct)">Refresh maps</button>
+            </div>
         </mat-card-content>
     </mat-card>
 </div>
 <div class="card-container">
     <mat-card class="card">
         <mat-card-header>
+          <div mat-card-avatar class="icd10-header-image"></div>
           <mat-card-title>ICD-10 Map</mat-card-title>
+          <mat-card-subtitle>WHO Version -  2019-covid-expanded</mat-card-subtitle>
           </mat-card-header>
           <mat-card-content>
+            <mat-spinner diameter="35" *ngIf="loadingIcd10"></mat-spinner>
             <div *ngIf="selectedReasonCIE.length"> 
-                <p>CIE-10 maps:</p>
-                <p class="selected-reason" *ngFor="let item of selectedReasonCIE">
-                    <span class="code">{{item.code}}</span>&nbsp;&nbsp;{{item.display}} 
-                    <a mat-icon-button color="accent" href="https://icd.who.int/browse10/2019/en#/{{item.code}}" target="_blank">
-                        <mat-icon>open_in_new</mat-icon>
-                    </a>
-                </p>
+                <ng-container *ngIf="!loadingIcd10">
+                    <p>
+                        Codes: 
+                        <span *ngFor="let item of selectedReasonCIE ; let ii = index">
+                            <span *ngIf="ii>0">,&nbsp;</span>
+                            <span class="code">{{ item.code }}</span>
+                        </span>
+                    </p>
+                    <p class="selected-reason" *ngFor="let item of selectedReasonCIE">
+                        <span class="code">{{item.code}}</span>&nbsp;&nbsp;{{item.display}} 
+                        <a mat-icon-button color="accent" href="https://icd.who.int/browse10/2019/en#/{{item.code}}" target="_blank" *ngIf="item.code">
+                            <mat-icon>open_in_new</mat-icon>
+                        </a>
+                    </p>
+                    <h3>Rules</h3>
+                    <table mat-table [dataSource]="icd10rules">
+                        <ng-container matColumnDef="mapGroup">
+                        <th mat-header-cell *matHeaderCellDef> mapGroup </th>
+                        <td mat-cell *matCellDef="let element"> {{element.mapGroup}} </td>
+                        </ng-container>
+                        <ng-container matColumnDef="mapPriority">
+                            <th mat-header-cell *matHeaderCellDef> mapPriority </th>
+                            <td mat-cell *matCellDef="let element"> {{element.mapPriority}} </td>
+                        </ng-container>
+                        <ng-container matColumnDef="mapRule">
+                            <th mat-header-cell *matHeaderCellDef> mapRule </th>
+                            <td mat-cell *matCellDef="let element"> {{element.mapRule}} </td>
+                        </ng-container>
+                        <ng-container matColumnDef="mapAdvice">
+                            <th mat-header-cell *matHeaderCellDef> mapAdvice </th>
+                            <td mat-cell *matCellDef="let element"> {{element.mapAdvice}} </td>
+                        </ng-container>
+                        <ng-container matColumnDef="mapTarget">
+                            <th mat-header-cell *matHeaderCellDef> mapTarget </th>
+                            <td mat-cell *matCellDef="let element"> {{element.mapTarget}} </td>
+                        </ng-container>
+                        <ng-container matColumnDef="link">
+                            <th mat-header-cell *matHeaderCellDef>  </th>
+                            <td mat-cell *matCellDef="let element">
+                                <a mat-icon-button color="accent" href="https://icd.who.int/browse10/2019/en#/{{element.mapTarget}}" target="_blank" *ngIf="element.mapTarget">
+                                    <mat-icon>open_in_new</mat-icon>
+                                </a>
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="result">
+                            <th mat-header-cell *matHeaderCellDef>  </th>
+                            <td mat-cell *matCellDef="let element">
+                                <mat-icon *ngIf="element.result" class="ok-result">check_circle</mat-icon>
+                            </td>
+                        </ng-container>
+                        <tr mat-header-row *matHeaderRowDef="icd10DisplayedColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: icd10DisplayedColumns;"></tr>
+                    </table>
+                </ng-container>
             </div>
           </mat-card-content>
     </mat-card>
     <mat-card class="card">
         <mat-card-header>
-          <mat-card-title>ICD-11 Map</mat-card-title>
+            <div mat-card-avatar class="icd11-header-image"></div>
+            <mat-card-title>ICD-11 Map</mat-card-title>
+            <mat-card-subtitle>ICD-11 MMS Linearization - March 2021</mat-card-subtitle>
           </mat-card-header>
           <mat-card-content>
+            <mat-spinner diameter="35" *ngIf="loadingIcd11"></mat-spinner>
             <div *ngIf="selectedReasonCIE11.length">
-                <p>CIE-11 maps:</p>
-                <ng-container>
-                    Codes: 
-                    <ng-container *ngFor="let code of selectedReasonCIE11; ; let ii = index">
-                        <span *ngIf='ii>0'>,&nbsp;</span>
-                        <ng-container *ngFor="let part of code; let i = index">
-                            <span class="code">{{ part.code }}<ng-container *ngIf="i !== code.length - 1">&amp;</ng-container></span>
+                <ng-container *ngIf="!loadingIcd11">
+                    <p>
+                        Codes: 
+                        <ng-container *ngFor="let code of selectedReasonCIE11; let ii = index">
+                            <span *ngIf='ii>0'>,&nbsp;</span>
+                            <ng-container *ngFor="let part of code; let i = index">
+                                <span class="code">{{ part.code }}<ng-container *ngIf="i !== code.length - 1">&amp;</ng-container></span>
+                            </ng-container>
                         </ng-container>
-                    </ng-container>
+                    </p>
                     <ng-container *ngFor="let code of selectedReasonCIE11; ; let ii = index">
                         
                         <ng-container *ngFor="let part of code; let i = index">
@@ -70,6 +142,37 @@
                         </ng-container>
                     </ng-container>
                 </ng-container>
+                <h3>Rules</h3>
+                <table mat-table [dataSource]="icd11rules">
+                    <ng-container matColumnDef="mapGroup">
+                      <th mat-header-cell *matHeaderCellDef> mapGroup </th>
+                      <td mat-cell *matCellDef="let element"> {{element.mapGroup}} </td>
+                    </ng-container>
+                    <ng-container matColumnDef="mapPriority">
+                        <th mat-header-cell *matHeaderCellDef> mapPriority </th>
+                        <td mat-cell *matCellDef="let element"> {{element.mapPriority}} </td>
+                    </ng-container>
+                    <ng-container matColumnDef="mapRule">
+                        <th mat-header-cell *matHeaderCellDef> mapRule </th>
+                        <td mat-cell *matCellDef="let element"> TRUE </td>
+                    </ng-container>
+                    <ng-container matColumnDef="mapAdvice">
+                        <th mat-header-cell *matHeaderCellDef> mapAdvice </th>
+                        <td mat-cell *matCellDef="let element"> {{element.mapAdvice}} </td>
+                    </ng-container>
+                    <ng-container matColumnDef="mapTarget">
+                        <th mat-header-cell *matHeaderCellDef> mapTarget </th>
+                        <td mat-cell *matCellDef="let element"> {{element.mapTarget}} </td>
+                    </ng-container>
+                    <ng-container matColumnDef="result">
+                        <th mat-header-cell *matHeaderCellDef>  </th>
+                        <td mat-cell *matCellDef="let element">
+                            <mat-icon class="ok-result">check_circle</mat-icon>
+                        </td>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="icd11DisplayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: icd11DisplayedColumns;"></tr>
+                  </table>
             </div>
           </mat-card-content>
     </mat-card>
