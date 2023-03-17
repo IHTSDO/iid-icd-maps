@@ -45,12 +45,12 @@ mat-card-title {
 }
 
 .icd10-header-image {
-    background-image: url('/assets/img/icd-10.jpg');
+    background-image: url('https://ihtsdo.github.io/iid-icd-maps/assets/img/icd-10.jpg');
     background-size: cover;
 }
 
 .icd11-header-image {
-    background-image: url('/assets/img/icd-11.jpg');
+    background-image: url('https://ihtsdo.github.io/iid-icd-maps/assets/img/icd-11.jpg');
     background-size: cover;
 }
 
