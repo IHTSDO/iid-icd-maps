@@ -8,7 +8,7 @@ The web site demostrates the logic for interpreting [Complex Map Reference Set](
 
 ## Demo site
 
-Coming soon...
+https://ihtsdo.github.io/iid-icd-maps/
 
 ## Development server
 
