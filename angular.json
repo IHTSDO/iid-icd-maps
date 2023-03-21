@@ -28,7 +28,11 @@
               "src/custom-theme.scss",
               "src/styles.css"
             ],
-            "scripts": []
+            "scripts": [],
+            "allowedCommonJsDependencies": [
+              "papaparse",
+              "file-saver"
+            ]
           },
           "configurations": {
             "production": {

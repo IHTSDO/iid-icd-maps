@@ -63,7 +63,7 @@
                     </p>
                     <p class="selected-reason" *ngFor="let item of selectedReasonCIE">
                         <span class="code">{{item.code}}</span>&nbsp;&nbsp;{{item.display}} 
-                        <a mat-icon-button color="accent" href="https://icd.who.int/browse10/2019/en#/{{item.code}}" target="_blank" *ngIf="item.code">
+                        <a mat-icon-button color="accent" href="https://icd.who.int/browse10/2019/en#/{{removeSecondDigitAfterDot(item.code)}}" target="_blank" *ngIf="item.code">
                             <mat-icon>open_in_new</mat-icon>
                         </a>
                     </p>
@@ -92,7 +92,7 @@
                         <ng-container matColumnDef="link">
                             <th mat-header-cell *matHeaderCellDef>  </th>
                             <td mat-cell *matCellDef="let element">
-                                <a mat-icon-button color="accent" href="https://icd.who.int/browse10/2019/en#/{{element.mapTarget}}" target="_blank" *ngIf="element.mapTarget">
+                                <a mat-icon-button color="accent" href="https://icd.who.int/browse10/2019/en#/{{removeSecondDigitAfterDot(element.mapTarget)}}" target="_blank" *ngIf="element.mapTarget">
                                     <mat-icon>open_in_new</mat-icon>
                                 </a>
                             </td>

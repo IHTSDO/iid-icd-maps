@@ -243,4 +243,12 @@ export class IcdMapComponent {
       });
   }
 
+  removeSecondDigitAfterDot(code: string) {
+    let dotIndex = code.indexOf('.');
+    if (dotIndex > 0) {
+      code = code.substring(0, dotIndex + 2) + code.substring(dotIndex + 3);
+    }
+    return code;
+  }
+
 }
