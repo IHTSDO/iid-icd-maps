@@ -156,12 +156,10 @@ export class IcdMapComponent {
         let passesMapRules = false;
         if (element.mapRule == 'TRUE' || element.mapRule == "OTHERWISE TRUE") {
           passesMapRules = true;
-        } else if (element.mapRule == 'IFA 248153007 | Male (finding) |' && this.gender.code == "248153007") {
-          passesMapRules = true;
-        } else if (element.mapRule == 'IFA 248152002 | Female (finding) |' && this.gender.code == "248152002") {
-          passesMapRules = true;
-        } else if (element.mapRule.indexOf('IFA 445518008 | Age at onset of clinical finding (observable entity) |') >= 0 ) {
+        } else {
           let localRule = element.mapRule;
+          localRule = localRule.replace('IFA 248153007 | Male (finding) |', 'this.gender.code == "248153007"');
+          localRule = localRule.replace('IFA 248152002 | Female (finding) |', 'this.gender.code == "248152002"');
           localRule = localRule.replace('IFA 445518008 | Age at onset of clinical finding (observable entity) |', 'this.age');
           localRule = localRule.replace('AND', '&&');
           localRule = localRule.replace('OR', '||');
