@@ -18,7 +18,8 @@ export class AppComponent {
   selectedLanguage = 'en';
   fhirServers = [
     { name: "SNOMED Dev IS", url: "https://dev-is-browser.ihtsdotools.org/fhir"},
-    { name: "SNOMED Public", url: "https://snowstorm.ihtsdotools.org/fhir"}
+    { name: "SNOMED Public", url: "https://snowstorm.ihtsdotools.org/fhir"},
+    { name: "SNOMED Dev 2", url: "https://snowstorm-temp.kaicode.io/fhir"},
   ];
   selectedServer = this.fhirServers[0];
 
