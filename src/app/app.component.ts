@@ -21,7 +21,7 @@ export class AppComponent {
     { name: "SNOMED Public", url: "https://snowstorm.ihtsdotools.org/fhir"},
     { name: "SNOMED Dev 2", url: "https://snowstorm-temp.kaicode.io/fhir"},
   ];
-  selectedServer = this.fhirServers[0];
+  selectedServer = this.fhirServers[2];
 
   constructor( private codingSpecService: CodingSpecService, public excelService: ExcelService, private terminologyService: TerminologyService ) { }
 
@@ -38,27 +38,24 @@ export class AppComponent {
   }
 
   updateCodeSystemOptions() {
+    console.log("Initiating updateCodeSystemOptions")
     this.terminologyService.getCodeSystems().subscribe(response => {
       this.editionsDetails = [];
       this.editions = response.entry;
       let editionNames = new Set();
       this.editions.forEach(loopEdition => {
-        if (loopEdition.resource.title) {
-          const loopName = loopEdition.resource.title.substr(0,loopEdition.resource.title.lastIndexOf(' ')).trim();
-          if (loopName) {
-            editionNames.add(loopName);
-          }
-        }
+        editionNames.add(loopEdition.resource.title);
+        // editionNames.add(loopEdition.resource.title.substr(0,loopEdition.resource.title.lastIndexOf(' ')));
       });
       editionNames.forEach(editionName => {
         this.editionsDetails.push(
           {
             editionName: editionName,
-            editions: this.editions.filter( el => (el.resource.title?.includes(editionName))).sort( this.compare )
+            editions: this.editions.filter( el => (el.resource.title.includes(editionName))).sort( this.compare )
           }
         );
       });
-      const currentVerIndex = this.editionsDetails.findIndex(x => (x.editionName === 'International Edition SNOMED CT release' || x.editionName === 'International'));
+      const currentVerIndex = this.editionsDetails.findIndex(x => x.editionName === 'International Edition'); //  SNOMED CT release
       if (currentVerIndex >= 0) {
         this.setEdition(this.editionsDetails[currentVerIndex].editions[0]);
       } else {
