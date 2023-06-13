@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 @Component({
   selector: 'app-loading-dialog',
   template: `
-    <h2 mat-dialog-title>Loading ICD 11 map...</h2>
+    <h2 mat-dialog-title>Loading ICD maps...</h2>
     <div mat-dialog-content>
         <mat-progress-bar mode="determinate" [value]="progress"></mat-progress-bar>
 

@@ -23,6 +23,7 @@ export class IcdMapComponent {
   selectedReasonSct: any;
   selectedReasonCIE: any[] = [];
   selectedReasonCIE11: any[] = [];
+  icd10Data: any[] = [];
   icd11Data: any[] = [];
   icd11MapData: any[] = [];
   term: string = '';
@@ -43,6 +44,7 @@ export class IcdMapComponent {
     { code : '717934004', display : 'Osteomalacia due to vitamin D deficiency'}
     ];
 
+  useICD10CodeSystem = false;
   constructor(private terminologyService: TerminologyService, private http: HttpClient, private dialog: MatDialog) { }
 
   ngOnInit(): void {
@@ -178,12 +180,18 @@ export class IcdMapComponent {
             }
             if (element.mapTarget) {
               let cieCode = { code: element.mapTarget, display: '[Label not found]'};
-              this.terminologyService.lookupOtherCodeSystems('http://hl7.org/fhir/sid/icd-10', searchCode).subscribe(lookupResponse => {
-                if (lookupResponse?.parameter?.length > 0) {
-                  cieCode.display = lookupResponse.parameter.find((param: any) => param.name == 'display').valueString;
-                }
+              if (this.useICD10CodeSystem) {
+                this.terminologyService.lookupOtherCodeSystems('http://hl7.org/fhir/sid/icd-10', searchCode).subscribe(lookupResponse => {
+                  if (lookupResponse?.parameter?.length > 0) {
+                    cieCode.display = lookupResponse.parameter.find((param: any) => param.name == 'display').valueString;
+                  }
+                  this.selectedReasonCIE.push(cieCode);
+                });
+              } else {
+                cieCode.display = this.getDisplayFromICD10Data(searchCode);
                 this.selectedReasonCIE.push(cieCode);
-              });
+              }
+              
             } else {
               let cieCode = { code: element.mapTarget, display: element.mapAdvice};
               this.selectedReasonCIE.push(cieCode);
@@ -195,6 +203,13 @@ export class IcdMapComponent {
     });
   }
   
+  getDisplayFromICD10Data(code: string) {
+    let display = this.icd10Data.find((element: any) => element.ICD10_Code == code);
+    if (display) {
+      return display.Short_Description;
+    }
+    return '';
+  }
 
   fetchTsvFile() {
     const dialogRef = this.dialog.open(LoadingDialogComponent, { disableClose: true });
@@ -229,11 +244,76 @@ export class IcdMapComponent {
               }
             } else if (event.type === HttpEventType.Response) {
               // Close the dialog when the file is loaded
-              dialogRef.close();
+              // dialogRef.close();
               // Parse the TSV data into a JavaScript object using Papa Parse
               if (typeof event.body === 'string') {
                 const parsedData = Papa.parse(event.body, { header: true }).data;
                 this.icd11Data = parsedData;
+              }
+              this.http
+              .get('assets/icd102019-covid-expandedsyst_codes.txt', { responseType: 'text', reportProgress: true, observe: 'events' })
+              .subscribe((event) => {
+                if (event.type === HttpEventType.DownloadProgress) {
+                  // Calculate the progress percentage if possible
+                  if (event.total !== undefined) {
+                    const percentDone = Math.round((100 * event.loaded) / event.total);
+                    // console.log(`File is ${percentDone}% loaded.`);
+                    dialogRef.componentInstance.progress = percentDone;
+                  }
+                } else if (event.type === HttpEventType.Response) {
+                  // Close the dialog when the file is loaded
+                  dialogRef.close();
+                  // Parse the TSV data into a JavaScript object using Papa Parse
+                  if (typeof event.body === 'string') {
+                    const parsedData = Papa.parse(event.body, { header: true }).data;
+                    this.icd10Data = parsedData;
+                  }
+              }
+          });
+            }
+          });
+        }
+      });
+  }
+
+  fetchICD10CsvFile() {
+    const dialogRef = this.dialog.open(LoadingDialogComponent, { disableClose: true });
+    this.http
+      .get('assets/icd102019-covid-expandedsyst_codes.txt', { responseType: 'text', reportProgress: true, observe: 'events' })
+      .subscribe((event) => {
+        if (event.type === HttpEventType.DownloadProgress) {
+          // Calculate the progress percentage if possible
+          if (event.total !== undefined) {
+            const percentDone = Math.round((100 * event.loaded) / event.total);
+            // console.log(`File is ${percentDone}% loaded.`);
+            dialogRef.componentInstance.progress = percentDone;
+          }
+        } else if (event.type === HttpEventType.Response) {
+          // Close the dialog when the file is loaded
+          // dialogRef.close();
+          // Parse the CSV data into a JavaScript object using Papa Parse
+          if (typeof event.body === 'string') {
+            const parsedData = Papa.parse(event.body, { header: true }).data;
+            this.icd11MapData = parsedData;
+            // console.log(parsedData);
+          }
+          this.http
+          .get('assets/LinearizationMiniOutput-MMS-en.txt', { responseType: 'text', reportProgress: true, observe: 'events' })
+          .subscribe((event) => {
+            if (event.type === HttpEventType.DownloadProgress) {
+              // Calculate the progress percentage if possible
+              if (event.total !== undefined) {
+                const percentDone = Math.round((100 * event.loaded) / event.total);
+                // console.log(`File is ${percentDone}% loaded.`);
+                dialogRef.componentInstance.progress = percentDone;
+              }
+            } else if (event.type === HttpEventType.Response) {
+              // Close the dialog when the file is loaded
+              dialogRef.close();
+              // Parse the TSV data into a JavaScript object using Papa Parse
+              if (typeof event.body === 'string') {
+                const parsedData = Papa.parse(event.body, { header: true }).data;
+                this.icd10Data = parsedData;
               }
             }
           });
