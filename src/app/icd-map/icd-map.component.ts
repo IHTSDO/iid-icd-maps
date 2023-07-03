@@ -160,12 +160,13 @@ export class IcdMapComponent {
           passesMapRules = true;
         } else {
           let localRule = element.mapRule;
-          localRule = localRule.replace('IFA 248153007 | Male (finding) |', 'this.gender.code == "248153007"');
-          localRule = localRule.replace('IFA 248152002 | Female (finding) |', 'this.gender.code == "248152002"');
-          localRule = localRule.replace('IFA 445518008 | Age at onset of clinical finding (observable entity) |', 'this.age');
-          localRule = localRule.replace('AND', '&&');
-          localRule = localRule.replace('OR', '||');
-          localRule = localRule.replace(' years', '');
+          localRule = localRule.replaceAll('IFA 248153007 | Male (finding) |', 'this.gender.code == "248153007"');
+          localRule = localRule.replaceAll('IFA 248152002 | Female (finding) |', 'this.gender.code == "248152002"');
+          localRule = localRule.replaceAll('IFA 445518008 | Age at onset of clinical finding (observable entity) |', 'this.age');
+          localRule = localRule.replaceAll('AND', '&&');
+          localRule = localRule.replaceAll('OR', '||');
+          localRule = localRule.replaceAll(' years', '');
+          console.log(localRule);
           if (eval(localRule)) {
             passesMapRules = true;
           }
