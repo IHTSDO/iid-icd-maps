@@ -129,7 +129,7 @@ export class IcdMapComponent {
     this.loadingIcd10 = true;
     this.icd10rules = [];
     this.selectedReasonCIE = [];
-    let response = this.terminologyService.runEclLegacy(`^[*] 447562003 |ICD-10 complex map reference set| {{ M referencedComponentId = "${event.code}" }}`);
+    let response = this.terminologyService.runEclLegacy(`^[*] 447562003 |ICD-10 complex map reference set| {{ M referencedComponentId = ${event.code} }}`);
     response.subscribe(result => {
       result.items.sort((a: any, b: any) => {
         if (a.mapGroup < b.mapGroup) {
