@@ -1,0 +1,74 @@
+.code {
+    font-weight: bold;
+    color: rgb(184, 154, 43);
+}
+
+.card-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: stretch;
+  }
+  
+.card {
+    width: calc(50% - 10px);
+    margin-bottom: 20px;
+}
+
+.centered-card {
+    width: 70%;
+    margin-left: 15%;
+}
+
+.wide-card {
+    width: calc(100% - 10px);
+    margin-bottom: 20px;
+}
+mat-card-title {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.selected-reason {
+    display: flex;
+    align-items: center;
+    height: 1.1rem;
+}
+
+.selected-reason-big {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.postcoordination {
+    margin-left: 50px;
+}
+
+.chips {
+    margin-bottom: 15px;
+}
+
+.icd10-header-image {
+    background-image: url('https://ihtsdo.github.io/iid-icd-maps/assets/img/icd-10.jpg');
+    background-size: cover;
+}
+
+.icd11-header-image {
+    background-image: url('https://ihtsdo.github.io/iid-icd-maps/assets/img/icd-11.jpg');
+    background-size: cover;
+}
+
+.icdo-header-image {
+    background-image: url('https://ihtsdo.github.io/iid-icd-maps/assets/img/icd-o.png');
+    background-size: cover;
+}
+
+.ok-result {
+    color: green;
+}
+
+h3 {
+    text-align: center;
+    margin-top: 30px;
+}

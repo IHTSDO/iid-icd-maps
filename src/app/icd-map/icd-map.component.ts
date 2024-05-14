@@ -19,7 +19,7 @@ export class IcdMapComponent {
   gender = this.genders[0];
   age = 35;
 
-  eclReason = '< 404684003 |Clinical finding|';
+  eclReason = '< 138875005 |SNOMED CT Concept (SNOMED RT+CTV3)|';
   selectedReasonSct: any;
   selectedReasonCIE: any[] = [];
   selectedReasonCIE11: any[] = [];
@@ -41,10 +41,20 @@ export class IcdMapComponent {
     { code : '16705321000119109', display : 'Neoplasm of right kidney' },
     { code : '95208000', display : 'Photogenic epilepsy' },
     { code : '8619003', display : 'Infertile' },
-    { code : '717934004', display : 'Osteomalacia due to vitamin D deficiency'}
+    { code : '717934004', display : 'Osteomalacia due to vitamin D deficiency'},
+    { code: '39607008', display: 'Lung structure'},
+    { code: '82711006', display: 'Infiltrating duct carcinoma '}
     ];
 
   useICD10CodeSystem = false;
+
+  icdOMapDefinition = {
+    title: 'ICD-O-3',
+    subtitle: 'International Classification of Diseases for Oncology, Third Edition',
+    codeSystem: 'http://hl7.org/fhir/sid/icd-o',
+    headerClass: 'icdo-header-image'
+  }
+
   constructor(private terminologyService: TerminologyService, private http: HttpClient, private dialog: MatDialog) { }
 
   ngOnInit(): void {
@@ -70,7 +80,7 @@ export class IcdMapComponent {
     this.selectedReasonCIE11 = [];
     this.icd11rules = [];
     let filteredData = this.icd11MapData.filter((element: any) => element.referencedComponentId == event.code);
-    if (!filteredData || !filteredData[0].mapTarget) {
+    if (!filteredData || !filteredData[0]?.mapTarget) {
       this.selectedReasonCIE11.push([{ code: '', display: 'MAP SOURCE CONCEPT CANNOT BE CLASSIFIED WITH AVAILABLE DATA' }]);
       this.icd11rules = filteredData;
     } else {

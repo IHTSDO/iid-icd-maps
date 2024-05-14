@@ -28,6 +28,7 @@ import {MatTableModule} from '@angular/material/table';
 import { IcdMapComponent } from './icd-map/icd-map.component';
 import { AutocompleteBindingComponent } from './autocomplete-binding/autocomplete-binding.component';
 import { LoadingDialogComponent } from './alerts/loading-dialog.component';
+import { SimpleMapComponent } from './simple-map/simple-map.component';
 
 
 @NgModule({
@@ -35,7 +36,8 @@ import { LoadingDialogComponent } from './alerts/loading-dialog.component';
     AppComponent,
     IcdMapComponent,
     AutocompleteBindingComponent,
-    LoadingDialogComponent
+    LoadingDialogComponent,
+    SimpleMapComponent
   ],
   imports: [
     BrowserModule,

@@ -73,11 +73,11 @@ export class TerminologyService {
     return (error: any): Observable<T> => {
       console.error("There was an error!");
       console.log(error);
-      this._snackBar.openFromComponent(SnackAlertComponent, {
-        duration: 5 * 1000,
-        data: error.message,
-        panelClass: ['red-snackbar']
-      });
+      // this._snackBar.openFromComponent(SnackAlertComponent, {
+      //   duration: 5 * 1000,
+      //   data: error.message,
+      //   panelClass: ['red-snackbar']
+      // });
       // TODO: send the error to remote logging infrastructure
       // console.error(error); // log to console instead
   
@@ -137,6 +137,12 @@ export class TerminologyService {
       .pipe(
         catchError(this.handleError<any>('translate', {}))
       );
+  }
+
+  getSimpleMapTargets(code: string, targetSystem: string) {
+    // https://snowstorm.snomedtools.org/fhir/ConceptMap/$translate?code=91799009&system=http://snomed.info/sct&targetsystem=http://hl7.org/fhir/sid/icd-o
+    let requestUrl = `${this.snowstormFhirBase}/ConceptMap/$translate?code=${code}&system=http://snomed.info/sct&targetsystem=${targetSystem}`
+    return this.http.get<any>(requestUrl);
   }
 
   lookupOtherCodeSystems(system: string, code: string) {

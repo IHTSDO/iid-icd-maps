@@ -47,6 +47,7 @@ export class AutocompleteBindingComponent implements OnInit {
   optionSelected(value: any) {
     this.selectedConcept = value;
     this.selectionChange.emit(value);
+    this.term = value.display;
   }
 
   clearInput() {
