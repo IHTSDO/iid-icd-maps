@@ -47,6 +47,7 @@ export class IcdMapComponent {
     ];
 
   useICD10CodeSystem = false;
+  showICD11Map = false;
 
   icdOMapDefinition = {
     title: 'ICD-O-3',
@@ -59,6 +60,9 @@ export class IcdMapComponent {
 
   ngOnInit(): void {
     this.fetchTsvFile();
+    // Read ULR parameters, check if 'icd11' is present and set the flag to true
+    const urlParams = new URLSearchParams(window.location.search);
+    this.showICD11Map = urlParams.has('icd11');
   }
 
   setChip(chip: any) {
