@@ -1,5 +1,14 @@
 # International Classification of Diseases Maps Demontration
 
+> [!IMPORTANT]
+> **This demo has moved.** It has been migrated into the SCT Implementation Demonstrator
+> and is now available at
+> **https://ihtsdo.github.io/sct-implementation-demonstrator/#/icd-mappings**
+>
+> This repository is kept for reference only; the deployed site now redirects to the new
+> location. New development happens in the
+> [sct-implementation-demonstrator](https://github.com/IHTSDO/sct-implementation-demonstrator) repo.
+
 This is an educational project that demostrates the mappings between SNOMED CT, ICD-10 and ICD-11 MMS. 
 
 The ICD-11 maps are currently in a preview state [See ICD-11 MMS Map Preview release](https://confluence.ihtsdotools.org/pages/viewpage.action?pageId=142123361).
